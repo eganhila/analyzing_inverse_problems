@@ -14,7 +14,7 @@ y_train = np.concatenate([np.load('./dkfz_data/y_train.npy'),
                           np.load('./dkfz_data/y_additional.npy')], axis=0)
 
 # There is a single NaN in the dataset
-nan_index = np.unique(np.argwhere(y_train != y_train)[:,0])
+nan_index = np.unique(np.argwhere(y_train != y_train)[:, 0])
 x_train = np.delete(x_train, nan_index, axis=0)
 y_train = np.delete(y_train, nan_index, axis=0)
 
@@ -29,11 +29,11 @@ c.train_loader = torch.utils.data.DataLoader(
     torch.utils.data.TensorDataset(x_train, y_train),
     batch_size=c.batch_size, shuffle=True, drop_last=True)
 
-c.ndim_x      = 13
-c.ndim_pad_x  = 0
+c.ndim_x = 13
+c.ndim_pad_x = 0
 
-c.ndim_y      = 8
-c.ndim_z      = 5
+c.ndim_y = 8
+c.ndim_z = 5
 c.ndim_pad_zy = 0
 
 c.mmd_back_weighted = True
