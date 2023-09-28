@@ -92,7 +92,7 @@ def train_epoch(i_epoch, test=False):
 
         batch_idx += 1
 
-        x, y = Variable(x).to(c.device), Variable(y).to(c.device)
+        x, y = Variable(x).float().to(c.device), Variable(y).float().to(c.device)
 
         if c.add_y_noise > 0:
             y += c.add_y_noise * noise_batch(c.ndim_y)
@@ -173,17 +173,18 @@ def custom_test(x, y):
     return (best_fit == og_class).sum()/len(best_fit)
 
 
-def main(dat):
+def main(dat, verbose):
     monitoring.restart()
     acc = []
     all_train_losses = []
     all_test_losses = []
     # try:
-    monitoring.print_config()
+    if verbose:
+        monitoring.print_config()
     t_start = time()
     try:
         for i_epoch in range(-c.pre_low_lr, c.n_epochs):
-
+            print("actually training",flush=True)
             if i_epoch < 0:
                 for param_group in model.optim.param_groups:
                     param_group['lr'] = c.lr_init * 1e-1
@@ -197,8 +198,10 @@ def main(dat):
             acc.append(custom_test(*dat))
             all_train_losses.append(train_losses)
             all_test_losses.append(test_losses)
+            print("finished training loop",flush=True)
             
-            print(f"{i_epoch:03d}",acc[-1], all_test_losses[-1])
+            if verbose:
+                print(f"{i_epoch:03d}",acc[-1], all_test_losses[-1],flush=True)
     except:
         model.save(c.filename_out + '_ABORT')
         raise
