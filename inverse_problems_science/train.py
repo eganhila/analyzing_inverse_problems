@@ -95,6 +95,7 @@ def train_epoch(i_epoch, test=False):
         x, y = Variable(x).float().to(c.device), Variable(y).float().to(c.device)
 
         if c.add_y_noise > 0:
+            #print(y.shape, c.ndim_y, test)
             y += c.add_y_noise * noise_batch(c.ndim_y)
 
         if c.ndim_pad_x:
@@ -173,9 +174,10 @@ def custom_test(x, y):
     return (best_fit == og_class).sum()/len(best_fit)
 
 
-def main(dat, verbose):
+def main(dat_tr, dat_te, verbose):
     monitoring.restart()
-    acc = []
+    acc_tr = []
+    acc_te = []
     all_train_losses = []
     all_test_losses = []
     # try:
@@ -195,13 +197,15 @@ def main(dat, verbose):
             # monitoring.show_loss(np.concatenate([train_losses, test_losses]))
             model.scheduler_step()
 
-            acc.append(custom_test(*dat))
+            acc_tr.append(custom_test(*dat_tr))
+            acc_te.append(custom_test(*dat_te))
+
             all_train_losses.append(train_losses)
             all_test_losses.append(test_losses)
             print("finished training loop",flush=True)
             
             if verbose:
-                print(f"{i_epoch:03d}",acc[-1], all_test_losses[-1],flush=True)
+                print(f"{i_epoch:03d}",acc_tr[-1], acc_te[-1], all_test_losses[-1],flush=True)
     except:
         model.save(c.filename_out + '_ABORT')
         raise
@@ -210,7 +214,7 @@ def main(dat, verbose):
         print("\n\nTraining took %f minutes\n\n" % ((time()-t_start)/60.))
         model.save(c.filename_out)
 
-    return (acc, np.array(all_train_losses), np.array(all_test_losses))
+    return (acc_tr, acc_te, np.array(all_train_losses), np.array(all_test_losses))
 
 
 if __name__ == "__main__":
