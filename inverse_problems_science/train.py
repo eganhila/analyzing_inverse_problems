@@ -174,7 +174,7 @@ def custom_test(x, y):
     return (best_fit == og_class).sum()/len(best_fit)
 
 
-def main(dat_tr, dat_te, verbose):
+def main(dat_tr, dat_te, verbose, mlflow_log=False, init_epoch=0):
     monitoring.restart()
     acc_tr = []
     acc_te = []
@@ -206,6 +206,14 @@ def main(dat_tr, dat_te, verbose):
             
             if verbose:
                 print(f"{i_epoch:03d}",acc_tr[-1], acc_te[-1], all_test_losses[-1],flush=True)
+
+            if mlflow_log:
+                import mlflow
+                mlflow.log_metrics({"inn_acc_tr":acc_tr[-1], 'inn_acc_te':acc_te[-1]},step=i_epoch+init_epoch)
+                mlflow.log_metrics(dict(zip(['loss_0_train','loss_1_train','loss_2_train','loss_3_train'],
+                                           train_losses)), step=i_epoch)
+                mlflow.log_metrics(dict(zip([ 'loss_0_test','loss_1_test','loss_2_test','loss_3_test',],
+                            test_losses)), step=i_epoch)
     except:
         model.save(c.filename_out + '_ABORT')
         raise
