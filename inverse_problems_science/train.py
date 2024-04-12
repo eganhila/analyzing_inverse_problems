@@ -209,10 +209,11 @@ def main(dat_tr, dat_te, verbose, mlflow_log=False, init_epoch=0):
 
             if mlflow_log:
                 import mlflow
-                mlflow.log_metrics({"inn_acc_tr":acc_tr[-1], 'inn_acc_te':acc_te[-1]},step=i_epoch+init_epoch)
-                mlflow.log_metrics(dict(zip(['loss_0_train','loss_1_train','loss_2_train','loss_3_train'],
+                mlflow.log_metrics({"categorical_accuracy":acc_tr[-1], 
+                                    'val_categorical_accuracy':acc_te[-1]},step=i_epoch+init_epoch)
+                mlflow.log_metrics(dict(zip(['inn_loss_0','inn_loss_1','inn_loss_2','inn_loss_3'],
                                            train_losses)), step=i_epoch)
-                mlflow.log_metrics(dict(zip([ 'loss_0_test','loss_1_test','loss_2_test','loss_3_test',],
+                mlflow.log_metrics(dict(zip(['val_inn_loss_0','val_inn_loss_1','val_inn_loss_2','val_inn_loss_3'],
                             test_losses)), step=i_epoch)
     except:
         model.save(c.filename_out + '_ABORT')
